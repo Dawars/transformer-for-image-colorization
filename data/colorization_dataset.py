@@ -1,4 +1,5 @@
 import os.path
+from pathlib import Path
 from data.base_dataset import BaseDataset, get_transform
 from skimage import color  # require skimage
 from PIL import Image
@@ -36,7 +37,11 @@ class ColorizationDataset(BaseDataset):
         """
         BaseDataset.__init__(self, opt)
         self.dir = os.path.join(opt.dataroot, opt.phase)
-        self.AB_paths = [[self.opt.targetImage_path, self.opt.referenceImage_path]]
+
+        target_list = list(Path(self.opt.targetImage_path).glob("*.jpg"))
+        self.AB_paths = []
+        for target in target_list:
+            self.AB_paths.append([str(target), self.opt.referenceImage_path])
         self.ab_constant = np.load('./doc/ab_constant_filter.npy')
         self.transform_A = get_transform(self.opt, convert=False)
         self.transform_R = get_transform(self.opt, convert=False, must_crop=True)
